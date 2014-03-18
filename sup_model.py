@@ -30,6 +30,7 @@ class featureModel:
                                                 self.countFea[(word, ID, featureword)] = 1
                 
         def probSense(self, targetword, targetID):
+                # prob = # of (word A, sense S) / # of (word A)
 		number1 = 0
 		number2 = 0
 		for (word, ID) in self.count:
@@ -44,6 +45,7 @@ class featureModel:
                 return prob
 
 	def probFeature(self, targetword, targetID, targetfea):
+                # prob = # of (wordA, sense S, feature F) / # of (wordA, sense S)
                 if self.countFea[(targetword, targetID, targetfea)] == 0:
                         print 'Error: No such context in the training data'
                         return
