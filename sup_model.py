@@ -1,6 +1,12 @@
 #############################################################
 # Project 2: Supervised Modeling
 #############################################################
+# simple feature vector used: array of the (#=windowsize)preceding words and
+# (#=windowsize)following words
+# example: (windowsize = 3)
+# affect.v | 1 | ...make errors that could %% affect %% the security of Western Europe...
+# feature vector: (make, errors, could, security, Western, Europe)
+# Note: feature vector is chosen after lemmatizing
 
 from collections import Counter
 from sup_preprocessing import *
@@ -30,7 +36,7 @@ class featureModel:
                                                 self.countFea[(word, ID, featureword)] = 1
                 
         def probSense(self, targetword, targetID):
-                # prob = # of (word A, sense S) / # of (word A)
+                # prob P(s) = # of (word A, sense S) / # of (word A)
 		number1 = 0
 		number2 = 0
 		for (word, ID) in self.count:
@@ -45,7 +51,7 @@ class featureModel:
                 return prob
 
 	def probFeature(self, targetword, targetID, targetfea):
-                # prob = # of (wordA, sense S, feature F) / # of (wordA, sense S)
+                # prob P(f|s) = # of (wordA, sense S, feature F) / # of (wordA, sense S)
                 if self.countFea[(targetword, targetID, targetfea)] == 0:
                         print 'Error: No such context in the training data'
                         return

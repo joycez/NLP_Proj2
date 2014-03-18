@@ -1,0 +1,10 @@
+1. P(s|f)?
+
+By Bayesian rules, this is calculated by (page 3 in problem_statement.pdf)
+	P(s|f) = P(f|s)P(s)/P(f)
+and we provide functions to calculate P(f|s) (probFeature) and P(s) (probSense) separately. Multiply them to get what you want.
+
+2. Feature vector?
+
+By now, it's just a simple array of the preceding words and following words.
+See documentation in sup_model.py. 
