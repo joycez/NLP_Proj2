@@ -49,7 +49,6 @@ def lemma_stem_sentence(sentence):
         lemmed = lmtzr.lemmatize(single_word)
         if not lemmed in glob_Lucene:
             word_list.append(lemmed)
-    print word_list
     return word_list
 
 if __name__ == '__main__':
