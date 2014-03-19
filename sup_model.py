@@ -39,10 +39,13 @@ class featureModel:
                                                 self.countWordID[word][ID] = 1
                                 else:
                                         self.countWordID[word][ID] = 1
+                                exist = {}
                                 for featureword in example:
                                         if word in self.countFea.keys():
                                                 if ID in self.countFea[word].keys():
                                                         if featureword in self.countFea[word][ID].keys():
+                                                                if exist[featureword] == True:
+                                                                        continue
                                                                 self.countFea[word][ID][featureword] += 1
                                                         else:
                                                                 self.countFea[word][ID][featureword] = 1
@@ -50,7 +53,8 @@ class featureModel:
                                                         self.countFea[word][ID][featureword] = 1
                                         else:
                                                 self.countFea[word][ID][featureword] = 1
-
+                                        exist[featureword] = True
+                                        
         def probSense(self, targetword, targetID):
                 # prob P(s) = # of (word A, sense S) / # of (word A)
 
