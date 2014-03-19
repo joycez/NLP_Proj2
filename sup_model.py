@@ -32,16 +32,25 @@ class featureModel:
                                         self.countWord[word] += 1
                                 else:
                                         self.countWord[word] = 1
-                                if (word, ID) in self.countWordID:
-                                        self.countWordID[word][ID] += 1
+                                if word in self.countWordID.keys():
+                                        if ID in self.countWordID[word].keys():
+                                                self.countWordID[word][ID] += 1
+                                        else:
+                                                self.countWordID[word][ID] = 1
                                 else:
                                         self.countWordID[word][ID] = 1
                                 for featureword in example:
-                                        if (word, ID, featureword) in self.countFea:
-                                                self.countFea[word][ID][featureword] += 1
+                                        if word in self.countFea.keys():
+                                                if ID in self.countFea[word].keys():
+                                                        if featureword in self.countFea[word][ID].keys():
+                                                                self.countFea[word][ID][featureword] += 1
+                                                        else:
+                                                                self.countFea[word][ID][featureword] = 1
+                                                else:
+                                                        self.countFea[word][ID][featureword] = 1
                                         else:
                                                 self.countFea[word][ID][featureword] = 1
-                
+
         def probSense(self, targetword, targetID):
                 # prob P(s) = # of (word A, sense S) / # of (word A)
 		number1 = self.countWord[targetword]
@@ -61,14 +70,16 @@ class featureModel:
                 
                 # in what kind of cases could number1=0 happen? Python will raise key error if
                 # there is no such entry in the dictionary
-                if targetword, targetID not in self.countWordID.keys():
+                if (targetword, targetID) not in self.countWordID.keys():
                         prob = 0
                 else:
                         prob = 1.0 * number2/number1
                 return prob
-
+        
 	def probFeature(self, targetword, targetID, targetfea):
                 # prob P(f|s) = # of (wordA, sense S, feature F) / # of (wordA, sense S)
+                # NOTE: targetword, targetID, targetfea must all be strings
+
                 # TODO: BUG here
                 # if (targetword, targetID, targetfea) is not an existed key
                 # it raises an exception
@@ -77,7 +88,8 @@ class featureModel:
                 # if self.countFea[(targetword, targetID, targetfea)] == 0:
                         # print 'Error: No such context in the training data'
                         # return
-
+                print targetword, targetID, targetfea
+                print self.countWordID
                 number1 = self.countWordID[targetword][targetID]
 		number2 = self.countFea[targetword][targetID][targetfea]
                 if (targetword, targetID, targetfea) not in self.countFea.keys():

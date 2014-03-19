@@ -42,7 +42,7 @@ def inferExample(line, model):
 	maxProb = 0.0
 	numOfSense = dic[word][num]
 	for i in range(1, numOfSense+1):
-		prob = model.probSenseGivenFV(word, i, fv)
+		prob = model.probSenseGivenFV(word, str(i), fv)
 	if prob > maxProb:
 		maxProb = prob
 		maxSenseID = i
