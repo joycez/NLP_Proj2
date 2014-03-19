@@ -8,7 +8,12 @@ def main():
 ##  fM1 = featureModel('sample.data',3)
 ##  print fM1.probSense('exchange.n','5')
         # print fM1.probFeature('area.n','2','superiority')
-  evaluateValidFile('validation_data.data')
+  # for i in range(1, 11):
+		# print 'windowsize: ', i
+		# evaluateValidFile('validation_data.data', i)
+
+		evaluateValidFile('validation_data.data', 3)
+
                
 if __name__ == "__main__":
   main()

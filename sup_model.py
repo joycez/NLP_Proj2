@@ -43,7 +43,7 @@ class featureModel:
                                 for featureword in example:
                                         if word in self.countFea.keys():
                                                 if ID in self.countFea[word].keys():
-                                                        if featureword in self.countFea[word][ID].keys():
+                                                        if featureword in self.countFea[word][ID].keys() and featureword in exist.keys():
                                                                 if exist[featureword] == True:
                                                                         continue
                                                                 self.countFea[word][ID][featureword] += 1
@@ -108,6 +108,8 @@ class featureModel:
                                 prob = 0
                 else:
                         prob = 0
+                print 'probFeature: ', targetfea, '\ngiving word sense: ', (targetword, targetID)
+                print 'Prob: ', prob 
                 return prob
         
         def probFeatureVector(self, targetword, targetID, fv):
