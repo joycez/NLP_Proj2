@@ -98,7 +98,6 @@ class featureModel:
                         prob = 1.0 * number2/number1
                 return prob
         
-#########################################################################################################
         def probFeatureVector(self, targetword, targetID, fv):
                 prob = 1.0
                 for feature in fv:
@@ -108,4 +107,12 @@ class featureModel:
         def probSenseGivenFV(self, targetword, targetID, fv):
                 return self.probFeatureVector(targetword, targetID, fv) * self.probSense(targetword, targetID)
 
-        
+        def defaultSense(self, targetword):
+                maxNum = 0
+                maxID = ''
+                for targetID in self.countWordID[targetword].keys():
+                        if self.countWordID[targetword][targetID] > maxNum:
+                                maxID = targetID
+                                maxNum = self.countWordID[targetword][targetID]
+                return maxID
+                        
