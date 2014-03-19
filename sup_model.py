@@ -53,10 +53,8 @@ class featureModel:
 
         def probSense(self, targetword, targetID):
                 # prob P(s) = # of (word A, sense S) / # of (word A)
-		number1 = self.countWord[targetword]
-		number2 = self.countWordID[targetword][targetID]
 
-                # TODO:
+		# TODO:
                 # a.
                 # This is O(n), which makes evaluation a long process
                 # try a constant alternative
@@ -70,10 +68,15 @@ class featureModel:
                 
                 # in what kind of cases could number1=0 happen? Python will raise key error if
                 # there is no such entry in the dictionary
-                if (targetword, targetID) not in self.countWordID.keys():
-                        prob = 0
+                if targetword in self.countWordID.keys():
+                        if targetID in self.countWordID[targetword].keys():
+                                number1 = self.countWord[targetword]
+                                number2 = self.countWordID[targetword][targetID]
+                                prob = 1.0 * number2/number1
+                        else:
+                                prob = 0
                 else:
-                        prob = 1.0 * number2/number1
+                        prob = 0
                 return prob
         
 	def probFeature(self, targetword, targetID, targetfea):
@@ -88,14 +91,19 @@ class featureModel:
                 # if self.countFea[(targetword, targetID, targetfea)] == 0:
                         # print 'Error: No such context in the training data'
                         # return
-                print targetword, targetID, targetfea
-                print self.countWordID
-                number1 = self.countWordID[targetword][targetID]
-		number2 = self.countFea[targetword][targetID][targetfea]
-                if (targetword, targetID, targetfea) not in self.countFea.keys():
-                        prob = 0
+
+                if targetword in self.countFea.keys():
+                        if targetID in self.countFea[targetword].keys():
+                                if targetfea in self.countFea[targetword][targetID].keys():
+                                        number1 = self.countWordID[targetword][targetID]
+                                        number2 = self.countFea[targetword][targetID][targetfea]
+                                        prob = 1.0 * number2/number1
+                                else:
+                                        prob = 0
+                        else:
+                                prob = 0
                 else:
-                        prob = 1.0 * number2/number1
+                        prob = 0
                 return prob
         
         def probFeatureVector(self, targetword, targetID, fv):
