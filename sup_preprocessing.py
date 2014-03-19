@@ -16,6 +16,10 @@ glob_Lucene = ["a", "an", "and", "are", "as", "at", "be", "but", "by", "for", "i
 def parse_supervised(train_filename, windowsize):
     traindata = {}
     trainfile = open(train_filename,'r')
+    #TODO:
+    #Provide a sentence-level API that takes a single
+    #entry as input and output (word, senseID, lemma_stem_sentence(" ".join(example))
+    #see 'inference.py' line 31-37
     for line in trainfile.readlines():
         words = line.split()
         # only want the sentence starting from the 5th word in an entry 

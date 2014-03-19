@@ -1,10 +1,17 @@
-1. P(s|f)?
+What I did:
+1. Added two functions into 'sup_model.py' at the end
+2. Wrote 'Inference.py' to evaluate the model
 
-By Bayesian rules, this is calculated by (page 3 in problem_statement.pdf)
-	P(s|f) = P(f|s)P(s)/P(f)
-and we provide functions to calculate P(f|s) (probFeature) and P(s) (probSense) separately. Multiply them to get what you want.
+Current Result:
+Accurate: 0
+Total: 933
+Accuracy: 0.0
 
-2. Feature vector?
+See 'TODO' for improvements needed:
+1. ***FIRST PRIORITY*** See 'sup_model.py' line 44
+2. ***BUG HERE*** See 'sup_model.py' line 68
+3. See 'sup_preprocessing.py' line 19
+4. See 'sup_model.py' line 52
 
-By now, it's just a simple array of the preceding words and following words.
-See documentation in sup_model.py. 
+
+

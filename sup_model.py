@@ -39,6 +39,19 @@ class featureModel:
                 # prob P(s) = # of (word A, sense S) / # of (word A)
 		number1 = 0
 		number2 = 0
+
+                # TODO:
+                # a.
+                # This is O(n), which makes evaluation a long process
+                # try a constant alternative
+                # try storing the counts as self.count[word][id]
+                # then number2 = self.count[targetword][targetID]
+                # For number1:
+                # for id, cnt in self.count[targetword]:
+                #       number1 += cnt
+                # b.
+                # Raise an exception instead of Printing an Error
+
 		for (word, ID) in self.count:
                         if word == targetword:
                                 number1 += self.count[(word, ID)]
@@ -52,10 +65,29 @@ class featureModel:
 
 	def probFeature(self, targetword, targetID, targetfea):
                 # prob P(f|s) = # of (wordA, sense S, feature F) / # of (wordA, sense S)
-                if self.countFea[(targetword, targetID, targetfea)] == 0:
-                        print 'Error: No such context in the training data'
-                        return
-		prob = 1.0 * self.countFea[(targetword, targetID, targetfea)]/self.count[targetword, targetID]
+                # TODO: BUG here
+                # if (targetword, targetID, targetfea) is not an existed key
+                # it raises an exception
+                # I changed the codes as below, not sure if that's correct
+                
+                # if self.countFea[(targetword, targetID, targetfea)] == 0:
+                        # print 'Error: No such context in the training data'
+                        # return
+                if (targetword, targetID, targetfea) not in self.countFea.keys():
+                        prob = 0
+                else:
+		      prob = 1.0 * self.countFea[(targetword, targetID, targetfea)]/self.count[targetword, targetID]
                 return prob
+
+        
+#########################################################################################################
+        def probFeatureVector(self, targetword, targetID, fv):
+                prob = 1.0
+                for feature in fv:
+                        prob *= self.probFeature(targetword, targetID, feature)
+                return prob
+
+        def probSenseGivenFV(self, targetword, targetID, fv):
+                return self.probFeatureVector(targetword, targetID, fv) * self.probSense(targetword, targetID)
 
         
