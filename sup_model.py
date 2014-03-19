@@ -14,6 +14,7 @@ from sup_preprocessing import *
 
 class featureModel:
 	def __init__(self, trainFileName, windowsize):
+                # 1-D, 2-D and 3-D dictionaries are used to store training data
                 self.countWord = {}
                 self.countWordID = defaultdict(dict)
                 self.countFea = defaultdict(lambda: defaultdict(dict))
@@ -35,14 +36,11 @@ class featureModel:
                                         self.countWordID[word][ID] += 1
                                 else:
                                         self.countWordID[word][ID] = 1
-                                for featureword in example.split():
+                                for featureword in example:
                                         if (word, ID, featureword) in self.countFea:
                                                 self.countFea[word][ID][featureword] += 1
                                         else:
                                                 self.countFea[word][ID][featureword] = 1
-##                print self.countWord
-##                print self.countWordID
-##                print self.countFea
                 
         def probSense(self, targetword, targetID):
                 # prob P(s) = # of (word A, sense S) / # of (word A)
@@ -61,9 +59,12 @@ class featureModel:
                 # b.
                 # Raise an exception instead of Printing an Error
                 
-                if number1 == 0:
-                        raise ZeroDivisionError
-                prob = 1.0 * number2/number1
+                # in what kind of cases could number1=0 happen? Python will raise key error if
+                # there is no such entry in the dictionary
+                if targetword, targetID not in self.countWordID.keys():
+                        prob = 0
+                else:
+                        prob = 1.0 * number2/number1
                 return prob
 
 	def probFeature(self, targetword, targetID, targetfea):
@@ -84,7 +85,6 @@ class featureModel:
                 else:
                         prob = 1.0 * number2/number1
                 return prob
-
         
 #########################################################################################################
         def probFeatureVector(self, targetword, targetID, fv):

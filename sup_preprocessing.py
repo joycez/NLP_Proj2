@@ -21,23 +21,30 @@ def parse_supervised(train_filename, windowsize):
     #entry as input and output (word, senseID, lemma_stem_sentence(" ".join(example))
     #see 'inference.py' line 31-37
     for line in trainfile.readlines():
-        words = line.split()
-        # only want the sentence starting from the 5th word in an entry 
-        example = words[4:]
-        useful = lemma_stem_sentence(" ".join(example))
-        # find the target word
-        index = useful.index('%%')
-        prevCon = " ".join(useful[index-windowsize:index])
-        nextCon = " ".join(useful[index+3:index+windowsize+3])
-        useful = " ".join([prevCon, nextCon])
+        entry = parse_entry(line, windowsize)
         # output dictionary: {word:[example1, example2,..]}
-        if (words[0], words[2]) in traindata:
-            traindata[(words[0], words[2])].append(useful)
+        if (entry[0], entry[1]) in traindata:
+            traindata[(entry[0], entry[1])].append(entry[2])
         else:
-            traindata[(words[0], words[2])] = []
-            traindata[(words[0], words[2])].append(useful)
+            traindata[(entry[0], entry[1])] = []
+            traindata[(entry[0], entry[1])].append(entry[2])
 ##    print traindata
     return traindata
+
+def parse_entry(line, windowsize):
+    # given an original tuple in the train.data, parse it into an entry (word, senseID, context)
+    entry = []
+    words = line.split()
+    # only want the sentence starting from the 5th word in an entry
+    example = words[4:]
+    useful = lemma_stem_sentence(" ".join(example))
+    # find the target word
+    index = useful.index('%%')
+    fv = useful[index-windowsize:index] + useful[index+3:index+windowsize+3]
+    entry.append(words[0])
+    entry.append(words[2])
+    entry.append(fv)
+    return entry
 
 def lemma_stem_sentence(sentence):
     lmtzr = WordNetLemmatizer()
