@@ -54,7 +54,9 @@ class featureModel:
                                         else:
                                                 self.countFea[word][ID][featureword] = 1
                                         exist[featureword] = True
-                                        
+                # smoothing: add only one entry of (word, ID, whatever unknown words)
+                        self.countFea[word][ID]['UNK'] = 1
+                        
         def probSense(self, targetword, targetID):
                 # prob P(s) = # of (word A, sense S) / # of (word A)
 
@@ -99,11 +101,14 @@ class featureModel:
                 if targetword in self.countFea.keys():
                         if targetID in self.countFea[targetword].keys():
                                 if targetfea in self.countFea[targetword][targetID].keys():
-                                        number1 = self.countWordID[targetword][targetID]
+                                        number1 = self.countWordID[targetword][targetID] + 1
                                         number2 = self.countFea[targetword][targetID][targetfea]
                                         prob = 1.0 * number2/number1
                                 else:
-                                        prob = 0
+                                        # all unknown words are treated as the only one 'UNK' feature
+                                        number1 = self.countWordID[targetword][targetID] + 1
+                                        number2 = self.countFea[targetword][targetID]['UNK']
+                                        prob = 1.0 * number2/number1
                         else:
                                 prob = 0
                 else:
