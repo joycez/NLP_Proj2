@@ -4,16 +4,9 @@ from inference import *
 from nltk import *
 
 def main():
-##        fM1 = featureModel('training_data.data',3)
-##  fM1 = featureModel('sample.data',3)
-##  print fM1.probSense('exchange.n','5')
-        # print fM1.probFeature('area.n','2','superiority')
-  # for i in range(1, 11):
-		# print 'windowsize: ', i
-		# evaluateValidFile('validation_data.data', i)
+	#for i in range(11):
+	#	print "Window Size ",i
+		evaluateValidFile('validation_data.data', 2)
 
-		evaluateValidFile('validation_data.data', 3)
-
-               
 if __name__ == "__main__":
-  main()
+	main()

@@ -28,7 +28,6 @@ def parse_supervised(train_filename, windowsize):
         else:
             traindata[(entry[0], entry[1])] = []
             traindata[(entry[0], entry[1])].append(entry[2])
-##    print traindata
     return traindata
 
 def parse_entry(line, windowsize):
@@ -37,6 +36,7 @@ def parse_entry(line, windowsize):
     words = line.split()
     # only want the sentence starting from the 5th word in an entry
     example = words[4:]
+
     useful = lemma_stem_sentence(" ".join(example))
     # find the target word
     index = useful.index('%%')

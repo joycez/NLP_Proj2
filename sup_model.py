@@ -10,121 +10,63 @@
 
 from collections import Counter
 from collections import defaultdict
+from dic_preprocessing import *
 from sup_preprocessing import *
+from math import log
 
 class featureModel:
 	def __init__(self, trainFileName, windowsize):
-                # 1-D, 2-D and 3-D dictionaries are used to store training data
-                self.countWord = {}
-                self.countWordID = defaultdict(dict)
-                self.countFea = defaultdict(lambda: defaultdict(dict))
-                self.traindataSize = 0
-                self.windowsize = windowsize
-                self.traindata = parse_supervised(trainFileName, windowsize)
-		self.trainModel(self.traindata, windowsize)
-		             
+                self.WordTF_all = Counter()
+
+                data=parse_supervised(trainFileName, windowsize)
+                for word_n_ID, examples in data.items():
+                        for example in examples:
+                                for featureword in example:
+                                        self.WordTF_all[featureword]+=1
+
+                self.WordTF=Counter()
+                print 'COMMON: ', self.WordTF_all.most_common(1000)[:5]
+                for key,v in self.WordTF_all.most_common(1000):
+                        self.WordTF[key]=v
+                self.Ndict = len(self.WordTF)
+                
+                self.countWord = Counter()
+                self.countWordID = defaultdict(Counter)
+                self.countWordIDPair = defaultdict(Counter)
+                self.countWordIDFea = defaultdict(lambda: defaultdict(Counter))
+                self.countWordIDLocPair = defaultdict(lambda: defaultdict(Counter))
+                self.countWordIDLocFea = defaultdict(lambda:defaultdict(lambda: defaultdict(Counter)))
+                self.trainModel(data, windowsize)
+                
+                self.dic = parse_dictionary('dictionary-modified.xml')
+                
  	def trainModel(self, traindata, windowsize):
                 for word_n_ID, examples in traindata.items():
                         word = word_n_ID[0]
                         ID = word_n_ID[1]
+
                         for example in examples:
-                                if word in self.countWord:
-                                        self.countWord[word] += 1
-                                else:
-                                        self.countWord[word] = 1
-                                if word in self.countWordID.keys():
-                                        if ID in self.countWordID[word].keys():
-                                                self.countWordID[word][ID] += 1
-                                        else:
-                                                self.countWordID[word][ID] = 1
-                                else:
-                                        self.countWordID[word][ID] = 1
-                                exist = {}
-                                for featureword in example:
-                                        if word in self.countFea.keys():
-                                                if ID in self.countFea[word].keys():
-                                                        if featureword in self.countFea[word][ID].keys() and featureword in exist.keys():
-                                                                if exist[featureword] == True:
-                                                                        continue
-                                                                self.countFea[word][ID][featureword] += 1
-                                                        else:
-                                                                self.countFea[word][ID][featureword] = 1
-                                                else:
-                                                        self.countFea[word][ID][featureword] = 1
-                                        else:
-                                                self.countFea[word][ID][featureword] = 1
-                                        exist[featureword] = True
-                # smoothing: add only one entry of (word, ID, whatever unknown words)
-                        self.countFea[word][ID]['UNK'] = 1
+                                self.countWord[word] += 1
+                                self.countWordID[word][ID] += 1
+                                
+                                for i in range(len(example)):
+                                        featureword=example[i]
+                                        if self.WordTF[featureword]>0:
+                                                self.countWordIDPair[word][ID] += 1
+                                                self.countWordIDFea[word][ID][featureword]+=1
+                                                self.countWordIDLocPair[word][ID][i] +=1
+                                                self.countWordIDLocFea[word][ID][i][featureword]+=1
+
                         
-        def probSense(self, targetword, targetID):
-                # prob P(s) = # of (word A, sense S) / # of (word A)
-
-		# TODO:
-                # a.
-                # This is O(n), which makes evaluation a long process
-                # try a constant alternative
-                # try storing the counts as self.count[word][id]
-                # then number2 = self.count[targetword][targetID]
-                # For number1:
-                # for id, cnt in self.count[targetword]:
-                #       number1 += cnt
-                # b.
-                # Raise an exception instead of Printing an Error
-                
-                # in what kind of cases could number1=0 happen? Python will raise key error if
-                # there is no such entry in the dictionary
-                if targetword in self.countWordID.keys():
-                        if targetID in self.countWordID[targetword].keys():
-                                number1 = self.countWord[targetword]
-                                number2 = self.countWordID[targetword][targetID]
-                                prob = 1.0 * number2/number1
-                        else:
-                                prob = 0
-                else:
-                        prob = 0
+	def probSenseGivenFV(self, targetword, targetID, fv):
+                prob = log(self.countWordID[targetword][targetID]+1)-log(self.countWord[targetword]+self.dic[targetword]['num'])
+                for i in range(len(fv)):
+                        feature=fv[i]
+                        if self.WordTF[feature]>0:
+                                prob += log(self.countWordIDFea[targetword][targetID][feature]+1)-log(self.countWordIDPair[targetword][targetID]+self.Ndict)
+                                if (i>0 and i<3):
+                                        prob += log(self.countWordIDLocFea[targetword][targetID][i][feature]+1)-log(self.countWordIDLocPair[targetword][targetID][i]+self.Ndict)
                 return prob
-        
-	def probFeature(self, targetword, targetID, targetfea):
-                # prob P(f|s) = # of (wordA, sense S, feature F) / # of (wordA, sense S)
-                # NOTE: targetword, targetID, targetfea must all be strings
-
-                # TODO: BUG here
-                # if (targetword, targetID, targetfea) is not an existed key
-                # it raises an exception
-                # I changed the codes as below, not sure if that's correct
-                
-                # if self.countFea[(targetword, targetID, targetfea)] == 0:
-                        # print 'Error: No such context in the training data'
-                        # return
-
-                if targetword in self.countFea.keys():
-                        if targetID in self.countFea[targetword].keys():
-                                if targetfea in self.countFea[targetword][targetID].keys():
-                                        number1 = self.countWordID[targetword][targetID] + 1
-                                        number2 = self.countFea[targetword][targetID][targetfea]
-                                        prob = 1.0 * number2/number1
-                                else:
-                                        # all unknown words are treated as the only one 'UNK' feature
-                                        number1 = self.countWordID[targetword][targetID] + 1
-                                        number2 = self.countFea[targetword][targetID]['UNK']
-                                        prob = 1.0 * number2/number1
-                        else:
-                                prob = 0
-                else:
-                        prob = 0
-                print 'probFeature: ', targetfea, '\ngiving word sense: ', (targetword, targetID)
-                print 'Prob: ', prob 
-                return prob
-        
-        def probFeatureVector(self, targetword, targetID, fv):
-                prob = 1.0
-                for feature in fv:
-                        prob *= self.probFeature(targetword, targetID, feature)
-                return prob
-
-        def probSenseGivenFV(self, targetword, targetID, fv):
-                return self.probFeatureVector(targetword, targetID, fv) * self.probSense(targetword, targetID)
 
         def defaultSense(self, targetword):
                 maxNum = 0
